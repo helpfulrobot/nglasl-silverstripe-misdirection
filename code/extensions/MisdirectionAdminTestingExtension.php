@@ -5,34 +5,34 @@
  *	@author Nathan Glasl <nathan@silverstripe.com.au>
  */
 
-class MisdirectionAdminTestingExtension extends Extension {
+class MisdirectionAdminTestingExtension extends Extension
+{
 
-	/**
-	 *	Update the edit form to include the URL input and test button.
-	 */
+    /**
+     *	Update the edit form to include the URL input and test button.
+     */
 
-	public function updateEditForm($form) {
+    public function updateEditForm($form)
+    {
+        Requirements::css(MISDIRECTION_PATH . '/css/misdirection.css');
 
-		Requirements::css(MISDIRECTION_PATH . '/css/misdirection.css');
+        // Restrict this functionality to administrators.
 
-		// Restrict this functionality to administrators.
+        $user = Member::currentUserID();
+        if (Permission::checkMember($user, 'ADMIN')) {
+            $gridfield = $form->fields->items[0];
+            if (isset($gridfield)) {
 
-		$user = Member::currentUserID();
-		if(Permission::checkMember($user, 'ADMIN')) {
-			$gridfield = $form->fields->items[0];
-			if(isset($gridfield)) {
+                // Add the required HTML fragment.
 
-				// Add the required HTML fragment.
+                Requirements::javascript(MISDIRECTION_PATH . '/javascript/misdirection-testing.js');
+                $configuration = $gridfield->config;
+                $configuration->addComponent(new MisdirectionTesting());
+            }
+        }
 
-				Requirements::javascript(MISDIRECTION_PATH . '/javascript/misdirection-testing.js');
-				$configuration = $gridfield->config;
-				$configuration->addComponent(new MisdirectionTesting());
-			}
-		}
+        // Allow extension customisation.
 
-		// Allow extension customisation.
-
-		$this->owner->extend('updateMisdirectionAdminTestingExtensionEditForm', $form);
-	}
-
+        $this->owner->extend('updateMisdirectionAdminTestingExtensionEditForm', $form);
+    }
 }
